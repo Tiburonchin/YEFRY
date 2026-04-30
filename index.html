@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para ti</title>
+    <!-- Google Fonts: Noto Serif JP para ese toque elegante japonés -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        /* =========================================
+        VARIABLES Y RESET
+        ========================================= */
+        :root {
+            --bg-black: #050505;
+            --purple-main: #a855f7; /* Morado vibrante */
+            --purple-glow: #c084fc;
+            --text-light: #f8fafc;
+            --font-cute: 'Quicksand', sans-serif; /* Para lo romántico */
+            --font-metal: 'Metal Mania', cursive; /* Para el caos */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--text-light);
+            font-family: var(--font-cute);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; /* Evita que se pueda hacer scroll */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* =========================================
+        FASE 1: BOTÓN INICIAL (El Engaño)
+        ========================================= */
+        #start-screen {
+            position: absolute;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-black);
+            transition: opacity 0.5s ease;
+        }
+
+        .btn-cute {
+            background: transparent;
+            border: 2px solid var(--purple-main);
+            color: var(--purple-main);
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-family: var(--font-cute);
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-cute:active {
+            transform: scale(0.95);
+            background: var(--purple-main);
+            color: var(--bg-black);
+        }
+
+        /* =========================================
+        ELEMENTOS BIZARROS (Kuromi y Tortugas)
+        ========================================= */
+        .bizarre-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .sprite {
+            position: absolute;
+            opacity: 0; /* GSAP las hará aparecer */
+            font-size: 4rem; /* Tamaño base para emojis, o width para imágenes */
+            filter: drop-shadow(0 0 10px var(--purple-glow));
+        }
+
+        /* Posiciones iniciales para mobile */
+        #kuromi { top: 15%; left: 10%; font-size: 5rem; }
+        #turtle1 { bottom: 20%; right: 10%; }
+        #turtle2 { top: 50%; left: 5%; font-size: 3rem; }
+
+        /* Animación de "Headbanging" (Cabeceo metalero) */
+        .headbang {
+            animation: bang 0.3s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes bang {
+            0% { transform: translateY(0) rotate(-15deg); }
+            100% { transform: translateY(-25px) rotate(20deg); }
+        }
+
+        /* =========================================
+        CEREZOS MORADOS (Partículas)
+        ========================================= */
+        #sakura-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .petal {
+            position: absolute;
+            background-color: var(--purple-main);
+            border-radius: 150% 0 150% 0;
+            opacity: 0.6;
+            box-shadow: 0 0 8px var(--purple-glow);
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg) scale(1); }
+            100% { transform: translateY(110vh) rotate(720deg) scale(0.8); }
+        }
+
+        /* =========================================
+        TEXTOS Y NARRATIVA (Controlado por GSAP)
+        ========================================= */
+        #lyrics-container {
+            position: absolute;
+            width: 90%;
+            text-align: center;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .line {
+            position: absolute;
+            width: 100%;
+            opacity: 0; /* Oculto por defecto */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Estilo 1: El estallido metalero */
+        .text-metal {
+            font-family: var(--font-metal);
+            font-size: 3.5rem;
+            color: var(--text-light);
+            text-shadow: 3px 3px 0px var(--purple-main);
+            line-height: 1.1;
+        }
+
+        /* Estilo 2: Textos tiernos y bromas */
+        .text-cute {
+            font-family: var(--font-cute);
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
+            line-height: 1.4;
+            padding: 0 10px;
+        }
+
+        /* =========================================
+        FASE FINAL: LA FOTO
+        ========================================= */
+        #final-screen {
+            position: absolute;
+            z-index: 60;
+            width: 90%;
+            opacity: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .photo-frame {
+            width: 250px;
+            height: 250px;
+            border: 4px solid var(--purple-main);
+            border-radius: 15px;
+            object-fit: cover;
+            box-shadow: 0 0 20px var(--purple-glow);
+            margin-bottom: 20px;
+        }
+
+        .final-text {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .btn-metal {
+            background: var(--bg-black);
+            border: 2px solid var(--text-light);
+            color: var(--text-light);
+            padding: 12px 25px;
+            font-family: var(--font-metal);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-metal:active {
+            background: var(--text-light);
+            color: var(--bg-black);
+        }
+    </style>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para ti 💜🤘</title>
+    
+    <!-- Fuentes de Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Librería GSAP para las animaciones -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- Aquí enlazas el CSS que te pasé antes -->
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+
+    <!-- Contenedor para las flores moradas generadas por JS -->
+    <div id="sakura-container"></div>
+
+    <!-- FASE 1: Pantalla Inicial (El Engaño) -->
+    <div id="start-screen">
+        <button id="start-btn" class="btn-cute">Toca aquí para tu sorpresa 🌸</button>
+    </div>
+
+    <!-- ELEMENTOS BIZARROS -->
+    <div class="bizarre-elements">
+        <!-- Puedes cambiar el src por un PNG de Kuromi sin fondo -->
+        <img src="https://raw.githubusercontent.com/Tiburonchin/YEFRY/main/kuromi.png" alt="Kuromi" id="kuromi" class="sprite">
+        <!-- Emojis de tortugas (puedes cambiarlos por imágenes si prefieres) -->
+        <div id="turtle1" class="sprite">🐢</div>
+        <div id="turtle2" class="sprite">🐢</div>
+    </div>
+
+    <!-- FASE 2 y 3: Textos (Controlados por GSAP) -->
+    <div id="lyrics-container">
+        <!-- Los golpes metaleros -->
+        <div class="line text-metal" id="m1">¡FELIZ!</div>
+        <div class="line text-metal" id="m2">¡CUMPLEAÑOS!</div>
+        <div class="line text-metal" id="m3">¡MI AMOR!</div>
+
+        <!-- Las frases románticas y bromas -->
+        <div class="line text-cute" id="c1">Quería buscar algo normal para ti...</div>
+        <div class="line text-cute" id="c2">Pero tú eres de otro planeta y lo normal te queda chico 🛸</div>
+        <div class="line text-cute" id="c3">Eres la pieza que le faltaba a mi rompecabezas de locura.</div>
+        <div class="line text-cute" id="c4">Gracias por aguantar mis momentos más random y mi colección de memes extraños...</div>
+        <div class="line text-cute" id="c5">Mi mutante favorita, mi caos consentido, mi todo 💜👽</div>
+        <div class="line text-cute" id="c6">Hice este rincón digital para que tu esencia brille en la red por siempre.</div>
+        <div class="line text-cute" id="c7">¡Te amo más que al último pedazo de pizza, y eso es decir mucho!</div>
+    </div>
+
+    <!-- FASE 4: Pantalla Final -->
+    <div id="final-screen">
+        <!-- Cambia el src por la foto de ustedes -->
+        <img src="https://raw.githubusercontent.com/Tiburonchin/YEFRY/main/nosotros.jpg" alt="Nosotros" class="photo-frame">
+        <p class="final-text text-cute">
+            Gracias por existir y llenar mi vida de color morado.<br>
+            ¡Feliz vuelta al sol! Te amo muchísimo.
+        </p>
+        <button id="repeat-btn" class="btn-metal">REPETIR CAOS 🤘</button>
+    </div>
+
+    <!-- AUDIO: Master of Puppets -->
+    <audio id="bg-music" src="TU_CANCION_MASTER_OF_PUPPETS.mp3"></audio>
+
+    <!-- Aquí irá tu archivo JS -->
+    <script src="app.js"></script>
+
+</body>
+</html>
+    <script>
+       // =========================================
+// 1. GENERADOR DE CEREZOS MORADOS
+// =========================================
+function createSakura() {
+    const container = document.getElementById('sakura-container');
+    const petalCount = 40; // Cantidad de pétalos en pantalla
+
+    for (let i = 0; i < petalCount; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'petal';
+        
+        // Posición y tamaño aleatorio
+        petal.style.left = Math.random() * 100 + 'vw';
+        petal.style.width = Math.random() * 15 + 10 + 'px';
+        petal.style.height = petal.style.width;
+        
+        // Velocidad y retraso aleatorio para que no caigan todos a la vez
+        petal.style.animationDuration = Math.random() * 3 + 4 + 's';
+        petal.style.animationDelay = Math.random() * 5 + 's';
+        
+        container.appendChild(petal);
+    }
+}
+
+// Inicializar partículas
+createSakura();
+
+// =========================================
+// 2. REFERENCIAS DEL DOM
+// =========================================
+const startBtn = document.getElementById('start-btn');
+const repeatBtn = document.getElementById('repeat-btn');
+const bgMusic = document.getElementById('bg-music');
+const startScreen = document.getElementById('start-screen');
+const lyricsContainer = document.getElementById('lyrics-container');
+const finalScreen = document.getElementById('final-screen');
+
+// =========================================
+// 3. SECUENCIA DE ANIMACIÓN (GSAP)
+// =========================================
+// Creamos un timeline que NO arranca solo, y al terminar llama a la función de cierre
+const tl = gsap.timeline({ paused: true, onComplete: showFinalScreen });
+
+// --- Fase 2: El Estallido ---
+// Hacemos aparecer a Kuromi y las tortugas de golpe en el segundo 0
+tl.to(".sprite", { opacity: 1, duration: 0.1 }, 0);
+
+// Animamos los gritos metaleros (Golpes rápidos)
+tl.to("#m1", { opacity: 1, scale: 1.2, duration: 0.2, ease: "back.out(2)" })
+  .to("#m1", { opacity: 0, scale: 1.5, duration: 0.2 }, "+=0.6") // Ajusta este +=0.6 según el tempo
+
+  .to("#m2", { opacity: 1, scale: 1.2, duration: 0.2, ease: "back.out(2)" })
+  .to("#m2", { opacity: 0, scale: 1.5, duration: 0.2 }, "+=0.6")
+
+  .to("#m3", { opacity: 1, scale: 1.2, duration: 0.2, ease: "back.out(2)" })
+  .to("#m3", { opacity: 0, scale: 1.5, duration: 0.2 }, "+=0.8");
+
+// --- Fase 3: Las Bromas y el Romance ---
+// Textos tiernos (Apariciones más suaves)
+const cuteDuration = 0.5; // Tiempo de entrada
+const cuteDelay = "+=2.5"; // Tiempo que se queda en pantalla leyendo
+
+tl.to("#c1", { opacity: 1, y: -20, duration: cuteDuration })
+  .to("#c1", { opacity: 0, y: -40, duration: cuteDuration }, cuteDelay)
+
+  .to("#c2", { opacity: 1, y: -20, duration: cuteDuration })
+  .to("#c2", { opacity: 0, y: -40, duration: cuteDuration }, cuteDelay)
+
+  .to("#c3", { opacity: 1, y: -20, duration: cuteDuration })
+  .to("#c3", { opacity: 0, y: -40, duration: cuteDuration }, cuteDelay)
+
+  .to("#c4", { opacity: 1, y: -20, duration: cuteDuration })
+  .to("#c4", { opacity: 0, y: -40, duration: cuteDuration }, "+=3") // Un poco más de tiempo para leer esta larga
+
+  .to("#c5", { opacity: 1, y: -20, duration: cuteDuration })
+  .to("#c5", { opacity: 0, y: -40, duration: cuteDuration }, cuteDelay)
+
+  .to("#c6", { opacity: 1, y: -20, duration: cuteDuration })
+  .to("#c6", { opacity: 0, y: -40, duration: cuteDuration }, cuteDelay)
+
+  .to("#c7", { opacity: 1, scale: 1.1, duration: 1 })
+  .to("#c7", { opacity: 0, scale: 1.2, duration: cuteDuration }, "+=3");
+
+// =========================================
+// 4. LÓGICA DE PANTALLAS Y BOTONES
+// =========================================
+
+// Función para iniciar el caos
+startBtn.addEventListener('click', () => {
+    // Ocultar pantalla inicial
+    startScreen.style.opacity = 0;
+    setTimeout(() => {
+        startScreen.style.display = 'none';
+        
+        // Iniciar música
+        bgMusic.volume = 0.8; // Para que no la aturda de golpe
+        bgMusic.play();
+        
+        // Activar el cabeceo (headbang) agregando la clase CSS a los sprites
+        document.getElementById('kuromi').classList.add('headbang');
+        document.getElementById('turtle1').classList.add('headbang');
+        document.getElementById('turtle2').classList.add('headbang');
+
+        // Arrancar animación de GSAP
+        tl.play();
+    }, 500);
+});
+
+// Función de cierre (Se ejecuta al terminar el timeline de GSAP)
+function showFinalScreen() {
+    // Desvanecer personajes bizarros
+    gsap.to(".sprite", { opacity: 0, duration: 1 });
+    
+    // Bajar volumen suavemente (fade out)
+    let volFade = setInterval(() => {
+        if (bgMusic.volume > 0.1) {
+            bgMusic.volume -= 0.1;
+        } else {
+            clearInterval(volFade);
+        }
+    }, 500);
+
+    // Mostrar pantalla final con la foto
+    finalScreen.style.display = 'flex';
+    gsap.to("#final-screen", { opacity: 1, duration: 1.5, delay: 0.5 });
+}
+
+// Función para repetir todo
+repeatBtn.addEventListener('click', () => {
+    // Reiniciar música
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+    bgMusic.volume = 0.8;
+    bgMusic.play();
+
+    // Ocultar pantalla final y reaparecer sprites
+    gsap.to("#final-screen", { opacity: 0, duration: 0.5, onComplete: () => {
+        finalScreen.style.display = 'none';
+        gsap.to(".sprite", { opacity: 1, duration: 0.5 });
+        
+        // Reiniciar timeline
+        tl.restart();
+    }});
+});
+    </script>
+</body>
+</html>
