@@ -68,7 +68,9 @@
             bottom: 0;
             transform: scale(0.6);
             z-index: 1;
-            display: none; /* Se mostrará al final */
+            display: block; /* Visible desde el inicio para que crezcan lento */
+            opacity: 0;
+            transition: opacity 2s ease;
         }
 
         .flower {
@@ -76,7 +78,7 @@
             bottom: 10vmin;
             transform-origin: bottom center;
             z-index: 10;
-            --fl-speed: 0.8s;
+            --fl-speed: 2.5s; /* Animación más lenta */
         }
 
         .flower--1 { animation: moving-flower-1 4s linear infinite; }
@@ -163,7 +165,7 @@
             background-image: linear-gradient(to left, rgba(0, 0, 0, 0.2), transparent, 
             rgba(255, 255, 255, 0.2)), linear-gradient(to top, transparent 10%, #1a3315, #1a3315);
             box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.5);
-            animation: grow-flower-tree 4s backwards;
+            animation: grow-flower-tree 8s backwards; /* Crecimiento lento */
         }
 
         .flower__line__leaf {
@@ -409,7 +411,7 @@
             Gracias por existir y llenar mi vida de color morado.<br>
             ¡Feliz vuelta al sol! Te amo muchísimo.
         </p>
-        <div class="magic-message">Estas flores moradas son para ti 💜</div>
+        <div class="magic-message">Estas flores son para ti 💜</div>
         <button id="repeat-btn" class="btn-metal" style="margin-top: 20px;">REPETIR CAOS 🤘</button>
     </div>
 
@@ -457,6 +459,11 @@
             document.getElementById('start-screen').style.opacity = 0;
             setTimeout(() => {
                 document.getElementById('start-screen').style.display = 'none';
+                
+                // Mostrar flores y quitar pausa para que empiecen a crecer lento
+                document.getElementById('magic-flowers').style.opacity = 1;
+                document.body.classList.remove("container");
+
                 bgMusic.volume = 0.8;
                 bgMusic.play();
                 document.getElementById('kuromi').classList.add('headbang');
@@ -469,7 +476,6 @@
         function showFinalScreen() {
             gsap.to(".sprite", { opacity: 0, duration: 1 });
             finalScreen.style.display = 'flex';
-            document.getElementById('magic-flowers').style.display = 'block';
             gsap.to("#final-screen", { opacity: 1, duration: 1.5, delay: 0.5 });
         }
 
@@ -478,15 +484,24 @@
             bgMusic.play();
             gsap.to("#final-screen", { opacity: 0, duration: 0.5, onComplete: () => {
                 finalScreen.style.display = 'none';
-                document.getElementById('magic-flowers').style.display = 'none';
+                
+                // Reiniciar estado de las flores
+                document.body.classList.add("container");
+                document.getElementById('magic-flowers').style.opacity = 0;
+                
+                setTimeout(() => {
+                    document.body.classList.remove("container");
+                    document.getElementById('magic-flowers').style.opacity = 1;
+                }, 100);
+
                 gsap.to(".sprite", { opacity: 1, duration: 0.5 });
                 tl.restart();
             }});
         });
 
-        // Trigger para iniciar animaciones de las flores
+        // Ya no activamos en onload, sino al presionar Start
         window.onload = () => {
-            document.body.classList.remove("container");
+            // Esperando interacción...
         };
     </script>
 </body>
