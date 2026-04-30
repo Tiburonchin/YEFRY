@@ -320,7 +320,7 @@
         @keyframes fadeIn { to { opacity: 1; } }
     </style>
 </head>
-<body>
+<body class="container">
     <!-- FONDO DE NOCHE MÁGICA -->
     <div class="night"></div>
 
@@ -483,6 +483,11 @@
                 tl.restart();
             }});
         });
+
+        // Trigger para iniciar animaciones de las flores
+        window.onload = () => {
+            document.body.classList.remove("container");
+        };
     </script>
 </body>
 </html>
