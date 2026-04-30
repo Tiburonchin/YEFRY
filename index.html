@@ -222,6 +222,56 @@
             background: var(--text-light);
             color: var(--bg-black);
         }
+
+        /* =========================================
+        ANIMACIÓN DE FLOR PREMIUM
+        ========================================= */
+        .flower-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flower-main {
+            position: relative;
+            animation: flower-rotate 15s linear infinite;
+        }
+
+        .petal-p {
+            position: absolute;
+            width: 30px;
+            height: 50px;
+            background: linear-gradient(to top, var(--purple-main), #fff);
+            border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+            transform-origin: bottom center;
+            opacity: 0.8;
+            box-shadow: 0 0 15px var(--purple-glow);
+            animation: bloom-anim 4s infinite ease-in-out;
+        }
+
+        @keyframes bloom-anim {
+            0%, 100% { transform: scale(0.8) rotate(var(--angle)); }
+            50% { transform: scale(1.1) rotate(var(--angle)) translateY(-5px); }
+        }
+
+        @keyframes flower-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .center-f {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            z-index: 20;
+            box-shadow: 0 0 15px #fff, 0 0 30px var(--purple-glow);
+        }
     </style>
 </head>
 <body>
@@ -281,6 +331,21 @@
     <div id="final-screen">
         <!-- Cambia el src por la foto de ustedes -->
         <img src="https://raw.githubusercontent.com/Tiburonchin/YEFRY/main/nosotros.jpg" alt="Nosotros" class="photo-frame">
+        
+        <!-- Flor Animada -->
+        <div class="flower-wrapper">
+            <div class="flower-main">
+                <div class="petal-p" style="--angle: 0deg"></div>
+                <div class="petal-p" style="--angle: 45deg"></div>
+                <div class="petal-p" style="--angle: 90deg"></div>
+                <div class="petal-p" style="--angle: 135deg"></div>
+                <div class="petal-p" style="--angle: 180deg"></div>
+                <div class="petal-p" style="--angle: 225deg"></div>
+                <div class="petal-p" style="--angle: 270deg"></div>
+                <div class="petal-p" style="--angle: 315deg"></div>
+                <div class="center-f"></div>
+            </div>
+        </div>
         <p class="final-text text-cute">
             Gracias por existir y llenar mi vida de color morado.<br>
             ¡Feliz vuelta al sol! Te amo muchísimo.
